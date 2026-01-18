@@ -1,25 +1,38 @@
--- Wrap the monitor peripheral on the 'back' side
-local mon = peripheral.wrap("back")
+local mon = peripheral.wrap("top")
 
--- Clear the monitor and reset cursor
+-- Reset monitor
 mon.clear()
-mon.setCursorPos(1, 1)
+mon.setTextScale(1)
 
--- Open the text file in 'read' mode
-local file = fs.open("faq.txt", "r")
+local fileName = "filename.txt"
+local file = fs.open(fileName, "r")
 
 if file then
     local lineNum = 1
-    -- Read the file line by line
     local line = file.readLine()
+    
     while line do
         mon.setCursorPos(1, lineNum)
-        mon.write(line)
+        
+        -- Check for tags at the start of the string
+        if string.sub(line, 1, 3) == "(h)" then
+            mon.setTextColor(colors.blue)
+            -- Write the line starting AFTER the tag
+            mon.write(string.sub(line, 4)) 
+        elseif string.sub(line, 1, 3) == "(l)" then
+            mon.setTextColor(colors.red)
+            -- Write the line starting AFTER the tag
+            mon.write(string.sub(line, 4))
+        else
+            mon.setTextColor(colors.white)
+            mon.write(line)
+        end
         
         lineNum = lineNum + 1
         line = file.readLine()
     end
     file.close()
 else
-    mon.write("Error: File not found!")
+    mon.setTextColor(colors.red)
+    mon.write("Error: " .. fileName .. " not found!")
 end
