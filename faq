@@ -3,8 +3,9 @@ local mon = peripheral.wrap("top")
 -- Reset monitor
 mon.clear()
 mon.setTextScale(1)
+local w, h = mon.getSize() -- Get monitor width and height
 
-local fileName = "filename.txt"
+local fileName = "faq.txt"
 local file = fs.open(fileName, "r")
 
 if file then
@@ -12,18 +13,27 @@ if file then
     local line = file.readLine()
     
     while line do
-        mon.setCursorPos(1, lineNum)
-        
         -- Check for tags at the start of the string
         if string.sub(line, 1, 3) == "(h)" then
+            mon.setCursorPos(1, lineNum)
             mon.setTextColor(colors.blue)
-            -- Write the line starting AFTER the tag
             mon.write(string.sub(line, 4)) 
+            
         elseif string.sub(line, 1, 3) == "(l)" then
+            mon.setCursorPos(1, lineNum)
             mon.setTextColor(colors.red)
-            -- Write the line starting AFTER the tag
             mon.write(string.sub(line, 4))
+
+        elseif string.sub(line, 1, 3) == "(c)" then
+            local text = string.sub(line, 4)
+            -- Calculate center: (Monitor Width - Text Length) / 2
+            local startX = math.floor((w - #text) / 2) + 1
+            mon.setCursorPos(startX, lineNum)
+            mon.setTextColor(colors.orange)
+            mon.write(text)
+            
         else
+            mon.setCursorPos(1, lineNum)
             mon.setTextColor(colors.white)
             mon.write(line)
         end
@@ -33,6 +43,7 @@ if file then
     end
     file.close()
 else
+    mon.setCursorPos(1, 1)
     mon.setTextColor(colors.red)
     mon.write("Error: " .. fileName .. " not found!")
 end
