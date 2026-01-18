@@ -1,0 +1,25 @@
+-- Wrap the monitor peripheral on the 'back' side
+local mon = peripheral.wrap("back")
+
+-- Clear the monitor and reset cursor
+mon.clear()
+mon.setCursorPos(1, 1)
+
+-- Open the text file in 'read' mode
+local file = fs.open("faq.txt", "r")
+
+if file then
+    local lineNum = 1
+    -- Read the file line by line
+    local line = file.readLine()
+    while line do
+        mon.setCursorPos(1, lineNum)
+        mon.write(line)
+        
+        lineNum = lineNum + 1
+        line = file.readLine()
+    end
+    file.close()
+else
+    mon.write("Error: File not found!")
+end
